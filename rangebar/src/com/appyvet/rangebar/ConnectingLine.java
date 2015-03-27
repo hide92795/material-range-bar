@@ -43,16 +43,10 @@ public class ConnectingLine {
     public ConnectingLine(Context ctx, float y, float connectingLineWeight,
             int connectingLineColor) {
 
-        final Resources res = ctx.getResources();
-
-        float connectingLineWeight1 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                connectingLineWeight,
-                res.getDisplayMetrics());
-
         // Initialize the paint, set values
         mPaint = new Paint();
         mPaint.setColor(connectingLineColor);
-        mPaint.setStrokeWidth(connectingLineWeight1);
+        mPaint.setStrokeWidth(connectingLineWeight);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setAntiAlias(true);
 
