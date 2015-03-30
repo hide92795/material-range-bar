@@ -1251,7 +1251,7 @@ public class RangeBar extends View {
     private void releasePin(final PinView thumb) {
 
         final float nearestTickX = mBar.getNearestTickCoordinate(thumb);
-        thumb.setX(nearestTickX);
+        thumb.smoothSetX(nearestTickX);
         int tickIndex = mBar.getNearestTickIndex(thumb);
         thumb.setXValue(getPinValue(tickIndex));
         ValueAnimator animator = ValueAnimator.ofFloat(mExpandedPinRadius, 0);
