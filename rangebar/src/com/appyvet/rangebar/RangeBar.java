@@ -429,6 +429,54 @@ public class RangeBar extends View {
     }
 
     /**
+    * Sets the range bar to a specific start, end, and interval
+    * This method is helpfull if you are changing the scale of the bar
+    * where calling setTickStart would though an exception because the number of
+    * ticks is < 2
+    * @param tickStart The new starting value of the range
+    * @param tickEnd The new ending tick value
+    * @param interval The new tick interval. (Must satisfy the condition number of ticks > 2)
+    **/
+    public void setTickRange(int tickStart, int tickEnd, int interval){
+        int tickCount = (int) ((tickEnd - tickStart) / interval) + 1;
+        if (isValidTickCount(tickCount)) {
+            mTickCount = tickCount;
+            mTickInterval = interval;
+            mTickStart = tickStart;
+            mTickEnd = tickEnd;
+
+            // Prevents resetting the indices when creating new activity, but
+            // allows it on the first setting.
+            if (mFirstSetTickCount) {
+                mLeftIndex = 0;
+                mRightIndex = mTickCount - 1;
+
+                if (mListener != null) {
+                    mListener.onRangeChangeListener(this, mLeftIndex, mRightIndex,
+                            getPinValue(mLeftIndex),
+                            getPinValue(mRightIndex));
+                }
+            }
+            if (indexOutOfRange(mLeftIndex, mRightIndex)) {
+                mLeftIndex = 0;
+                mRightIndex = mTickCount - 1;
+
+                if (mListener != null) {
+                    mListener.onRangeChangeListener(this, mLeftIndex, mRightIndex,
+                            getPinValue(mLeftIndex),
+                            getPinValue(mRightIndex));
+                }
+            }
+
+            createBar();
+            createPins();
+        } else {
+            Log.e(TAG, "tickCount less than 2; invalid tickCount.");
+            throw new IllegalArgumentException("tickCount less than 2; invalid tickCount.");
+        }
+    }
+
+    /**
      * Sets the start tick in the RangeBar.
      *
      * @param tickStart Integer specifying the number of ticks.
