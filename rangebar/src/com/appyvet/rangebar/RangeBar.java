@@ -175,6 +175,9 @@ public class RangeBar extends View {
     private float mLastX;
 
     private float mLastY;
+    private IRangeBarFormatter mFormatter;
+
+    private boolean drawTicks = true;
 
     // Constructors ////////////////////////////////////////////////////////////
 
@@ -312,9 +315,11 @@ public class RangeBar extends View {
         final float yPos = h - mBarPaddingBottom;
         if (mIsRangeBar) {
             mLeftThumb = new PinView(ctx);
+            mLeftThumb.setFormatter(mFormatter);
             mLeftThumb.init(ctx, yPos, 0, mPinColor, mTextColor, mCircleSize, mCircleColor);
         }
         mRightThumb = new PinView(ctx);
+        mRightThumb.setFormatter(mFormatter);
         mRightThumb.init(ctx, yPos, 0, mPinColor, mTextColor, mCircleSize, mCircleColor);
 
         // Create the underlying bar.
@@ -358,11 +363,15 @@ public class RangeBar extends View {
         mBar.draw(canvas);
         if (mIsRangeBar) {
             mConnectingLine.draw(canvas, mLeftThumb, mRightThumb);
-            mBar.drawTicks(canvas);
+            if(drawTicks) {
+                mBar.drawTicks(canvas);
+            }
             mLeftThumb.draw(canvas);
         } else {
             mConnectingLine.draw(canvas, getMarginLeft(), mRightThumb);
-            mBar.drawTicks(canvas);
+            if(drawTicks) {
+                mBar.drawTicks(canvas);
+            }
         }
         mRightThumb.draw(canvas);
 
@@ -428,6 +437,23 @@ public class RangeBar extends View {
      */
     public void setOnRangeBarChangeListener(OnRangeBarChangeListener listener) {
         mListener = listener;
+    }
+
+
+    public void setFormatter(IRangeBarFormatter formatter) {
+        if(mLeftThumb != null) {
+            mLeftThumb.setFormatter(formatter);
+        }
+
+        if(mRightThumb != null) {
+            mRightThumb.setFormatter(formatter);
+        }
+
+        mFormatter = formatter;
+    }
+
+    public void setDrawTicks(boolean drawTicks) {
+        this.drawTicks = drawTicks;
     }
 
     /**
