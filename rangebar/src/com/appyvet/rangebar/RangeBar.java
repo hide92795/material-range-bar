@@ -145,6 +145,8 @@ public class RangeBar extends View {
 
     private OnRangeBarChangeListener mListener;
 
+    private OnRangeBarTextListener mPinTextListener;
+
     private HashMap<Float, String> mTickMap;
 
     private int mLeftIndex;
@@ -429,6 +431,7 @@ public class RangeBar extends View {
     }
 
     /**
+<<<<<<< HEAD
     * Sets the range bar to a specific start, end, and interval
     * This method is helpfull if you are changing the scale of the bar
     * where calling setTickStart would though an exception because the number of
@@ -437,7 +440,7 @@ public class RangeBar extends View {
     * @param tickEnd The new ending tick value
     * @param interval The new tick interval. (Must satisfy the condition number of ticks > 2)
     **/
-    public void setTickRange(int tickStart, int tickEnd, int interval){
+    public void setTickRange(int tickStart, int tickEnd, int interval) {
         int tickCount = (int) ((tickEnd - tickStart) / interval) + 1;
         if (isValidTickCount(tickCount)) {
             mTickCount = tickCount;
@@ -474,6 +477,12 @@ public class RangeBar extends View {
             Log.e(TAG, "tickCount less than 2; invalid tickCount.");
             throw new IllegalArgumentException("tickCount less than 2; invalid tickCount.");
         }
+    }
+    /* Sets a listener to modify the text
+     * @param mPinTextListener
+     */
+    public void setPinTextListener(OnRangeBarTextListener mPinTextListener) {
+        this.mPinTextListener = mPinTextListener;
     }
 
     /**
@@ -1245,9 +1254,20 @@ public class RangeBar extends View {
         }
 
         // Get the updated nearest tick marks for each thumb.
-        final int newLeftIndex = mIsRangeBar ? mBar.getNearestTickIndex(mLeftThumb) : 0;
-        final int newRightIndex = mBar.getNearestTickIndex(mRightThumb);
+        int newLeftIndex = mIsRangeBar ? mBar.getNearestTickIndex(mLeftThumb) : 0;
+        int newRightIndex = mBar.getNearestTickIndex(mRightThumb);
 
+        final int componentLeft = getLeft() + getPaddingLeft();
+        final int componentRight = getRight() - getPaddingRight() - componentLeft;
+
+        if (x<=componentLeft) {
+            newLeftIndex = 0;
+            movePin(mLeftThumb, mBar.getLeftX());
+        } else if (x>=componentRight) {
+            newRightIndex = getTickCount()-1;
+            movePin(mRightThumb, mBar.getRightX());
+        }
+        /// end added code
         // If either of the indices have changed, update and call the listener.
         if (newLeftIndex != mLeftIndex || newRightIndex != mRightIndex) {
 
@@ -1325,6 +1345,9 @@ public class RangeBar extends View {
      * @param tickIndex the index to set the value for
      */
     private String getPinValue(int tickIndex) {
+        if (mPinTextListener!=null) {
+            return mPinTextListener.getPinValue(this, tickIndex);
+        }
         float tickValue = (tickIndex == (mTickCount - 1))
                             ? mTickEnd
                             : (tickIndex * mTickInterval) + mTickStart;
@@ -1369,4 +1392,14 @@ public class RangeBar extends View {
         public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex,
                 int rightPinIndex, String leftPinValue, String rightPinValue);
     }
+
+    /**
+     * @author robmunro
+     * A callback that allows getting pin text exernally
+     */
+    public static interface OnRangeBarTextListener {
+        public String getPinValue(RangeBar rangeBar, int tickIndex);
+    }
+
+
 }
