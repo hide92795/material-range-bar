@@ -593,6 +593,10 @@ public class RangeBar extends View {
         }
     }
 
+    public void setTickMap(HashMap<Float, String> tickMap) {
+        mTickMap = tickMap;
+    }
+
     /**
      * Sets the end tick in the RangeBar.
      *
@@ -850,6 +854,10 @@ public class RangeBar extends View {
         }
         invalidate();
         requestLayout();
+    }
+
+    public void setExpandedRadius(float expandedRadius) {
+        mExpandedPinRadius = expandedRadius;
     }
 
     /**
