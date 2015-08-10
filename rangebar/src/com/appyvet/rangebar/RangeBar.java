@@ -145,6 +145,8 @@ public class RangeBar extends View {
 
     private OnRangeBarChangeListener mListener;
 
+    private OnRangeBarTextListener mPinTextListener;
+
     private HashMap<Float, String> mTickMap;
 
     private int mLeftIndex;
@@ -173,6 +175,9 @@ public class RangeBar extends View {
     private float mLastX;
 
     private float mLastY;
+    private IRangeBarFormatter mFormatter;
+
+    private boolean drawTicks = true;
 
     // Constructors ////////////////////////////////////////////////////////////
 
@@ -310,9 +315,11 @@ public class RangeBar extends View {
         final float yPos = h - mBarPaddingBottom;
         if (mIsRangeBar) {
             mLeftThumb = new PinView(ctx);
+            mLeftThumb.setFormatter(mFormatter);
             mLeftThumb.init(ctx, yPos, 0, mPinColor, mTextColor, mCircleSize, mCircleColor);
         }
         mRightThumb = new PinView(ctx);
+        mRightThumb.setFormatter(mFormatter);
         mRightThumb.init(ctx, yPos, 0, mPinColor, mTextColor, mCircleSize, mCircleColor);
 
         // Create the underlying bar.
@@ -356,11 +363,15 @@ public class RangeBar extends View {
         mBar.draw(canvas);
         if (mIsRangeBar) {
             mConnectingLine.draw(canvas, mLeftThumb, mRightThumb);
-            mBar.drawTicks(canvas);
+            if(drawTicks) {
+                mBar.drawTicks(canvas);
+            }
             mLeftThumb.draw(canvas);
         } else {
             mConnectingLine.draw(canvas, getMarginLeft(), mRightThumb);
-            mBar.drawTicks(canvas);
+            if(drawTicks) {
+                mBar.drawTicks(canvas);
+            }
         }
         mRightThumb.draw(canvas);
 
@@ -426,6 +437,78 @@ public class RangeBar extends View {
      */
     public void setOnRangeBarChangeListener(OnRangeBarChangeListener listener) {
         mListener = listener;
+    }
+
+
+    public void setFormatter(IRangeBarFormatter formatter) {
+        if(mLeftThumb != null) {
+            mLeftThumb.setFormatter(formatter);
+        }
+
+        if(mRightThumb != null) {
+            mRightThumb.setFormatter(formatter);
+        }
+
+        mFormatter = formatter;
+    }
+
+    public void setDrawTicks(boolean drawTicks) {
+        this.drawTicks = drawTicks;
+    }
+
+    /**
+<<<<<<< HEAD
+    * Sets the range bar to a specific start, end, and interval
+    * This method is helpfull if you are changing the scale of the bar
+    * where calling setTickStart would though an exception because the number of
+    * ticks is < 2
+    * @param tickStart The new starting value of the range
+    * @param tickEnd The new ending tick value
+    * @param interval The new tick interval. (Must satisfy the condition number of ticks > 2)
+    **/
+    public void setTickRange(int tickStart, int tickEnd, int interval) {
+        int tickCount = (int) ((tickEnd - tickStart) / interval) + 1;
+        if (isValidTickCount(tickCount)) {
+            mTickCount = tickCount;
+            mTickInterval = interval;
+            mTickStart = tickStart;
+            mTickEnd = tickEnd;
+
+            // Prevents resetting the indices when creating new activity, but
+            // allows it on the first setting.
+            if (mFirstSetTickCount) {
+                mLeftIndex = 0;
+                mRightIndex = mTickCount - 1;
+
+                if (mListener != null) {
+                    mListener.onRangeChangeListener(this, mLeftIndex, mRightIndex,
+                            getPinValue(mLeftIndex),
+                            getPinValue(mRightIndex));
+                }
+            }
+            if (indexOutOfRange(mLeftIndex, mRightIndex)) {
+                mLeftIndex = 0;
+                mRightIndex = mTickCount - 1;
+
+                if (mListener != null) {
+                    mListener.onRangeChangeListener(this, mLeftIndex, mRightIndex,
+                            getPinValue(mLeftIndex),
+                            getPinValue(mRightIndex));
+                }
+            }
+
+            createBar();
+            createPins();
+        } else {
+            Log.e(TAG, "tickCount less than 2; invalid tickCount.");
+            throw new IllegalArgumentException("tickCount less than 2; invalid tickCount.");
+        }
+    }
+    /* Sets a listener to modify the text
+     * @param mPinTextListener
+     */
+    public void setPinTextListener(OnRangeBarTextListener mPinTextListener) {
+        this.mPinTextListener = mPinTextListener;
     }
 
     /**
@@ -1197,9 +1280,20 @@ public class RangeBar extends View {
         }
 
         // Get the updated nearest tick marks for each thumb.
-        final int newLeftIndex = mIsRangeBar ? mBar.getNearestTickIndex(mLeftThumb) : 0;
-        final int newRightIndex = mBar.getNearestTickIndex(mRightThumb);
+        int newLeftIndex = mIsRangeBar ? mBar.getNearestTickIndex(mLeftThumb) : 0;
+        int newRightIndex = mBar.getNearestTickIndex(mRightThumb);
 
+        final int componentLeft = getLeft() + getPaddingLeft();
+        final int componentRight = getRight() - getPaddingRight() - componentLeft;
+
+        if (x<=componentLeft) {
+            newLeftIndex = 0;
+            movePin(mLeftThumb, mBar.getLeftX());
+        } else if (x>=componentRight) {
+            newRightIndex = getTickCount()-1;
+            movePin(mRightThumb, mBar.getRightX());
+        }
+        /// end added code
         // If either of the indices have changed, update and call the listener.
         if (newLeftIndex != mLeftIndex || newRightIndex != mRightIndex) {
 
@@ -1277,6 +1371,9 @@ public class RangeBar extends View {
      * @param tickIndex the index to set the value for
      */
     private String getPinValue(int tickIndex) {
+        if (mPinTextListener!=null) {
+            return mPinTextListener.getPinValue(this, tickIndex);
+        }
         float tickValue = (tickIndex == (mTickCount - 1))
                             ? mTickEnd
                             : (tickIndex * mTickInterval) + mTickStart;
@@ -1321,4 +1418,14 @@ public class RangeBar extends View {
         public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex,
                 int rightPinIndex, String leftPinValue, String rightPinValue);
     }
+
+    /**
+     * @author robmunro
+     * A callback that allows getting pin text exernally
+     */
+    public static interface OnRangeBarTextListener {
+        public String getPinValue(RangeBar rangeBar, int tickIndex);
+    }
+
+
 }
