@@ -13,6 +13,8 @@
 
 package com.appyvet.rangebar;
 
+import android.animation.ValueAnimator;
+import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
@@ -40,6 +42,9 @@ class PinView extends View {
     // Sets the default values for radius, normal, pressed if circle is to be
     // drawn but no value is given.
     private static final float DEFAULT_THUMB_RADIUS_DP = 14;
+
+    // Default value for smooth coordinates update duration (in ms).
+    private static final int SMOOTH_UPDATE_DURATION = 100;
 
     // Member Variables ////////////////////////////////////////////////////////
 
@@ -158,6 +163,19 @@ class PinView extends View {
         mX = x;
     }
 
+    public void smoothSetX(float x) {
+        float currentX = getX();
+        ValueAnimator animator = ValueAnimator.ofFloat(currentX, x);
+        animator.addUpdateListener(new AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                setX((Float) animation.getAnimatedValue());
+                invalidate();
+            }
+        });
+        animator.setDuration(SMOOTH_UPDATE_DURATION);
+        animator.start();
+    }
 
     /**
      * Get the x value of the pin

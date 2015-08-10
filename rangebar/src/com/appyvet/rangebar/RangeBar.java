@@ -71,7 +71,7 @@ public class RangeBar extends View {
 
     private static final float DEFAULT_PIN_PADDING_DP = 16;
 
-    private static final float DEFAULT_BAR_WEIGHT_PX = 2;
+    private static final float DEFAULT_BAR_WEIGHT_DP = 2;
 
     private static final int DEFAULT_BAR_COLOR = Color.LTGRAY;
 
@@ -82,7 +82,7 @@ public class RangeBar extends View {
     // Corresponds to material indigo 500.
     private static final int DEFAULT_PIN_COLOR = 0xff3f51b5;
 
-    private static final float DEFAULT_CONNECTING_LINE_WEIGHT_PX = 4;
+    private static final float DEFAULT_CONNECTING_LINE_WEIGHT_DP = 4;
 
     // Corresponds to material indigo 500.
     private static final int DEFAULT_CONNECTING_LINE_COLOR = 0xff3f51b5;
@@ -103,7 +103,7 @@ public class RangeBar extends View {
 
     private float mTickInterval = DEFAULT_TICK_INTERVAL;
 
-    private float mBarWeight = DEFAULT_BAR_WEIGHT_PX;
+    private float mBarWeight = DEFAULT_BAR_WEIGHT_DP;
 
     private int mBarColor = DEFAULT_BAR_COLOR;
 
@@ -111,7 +111,7 @@ public class RangeBar extends View {
 
     private int mTextColor = DEFAULT_TEXT_COLOR;
 
-    private float mConnectingLineWeight = DEFAULT_CONNECTING_LINE_WEIGHT_PX;
+    private float mConnectingLineWeight = DEFAULT_CONNECTING_LINE_WEIGHT_DP;
 
     private int mConnectingLineColor = DEFAULT_CONNECTING_LINE_COLOR;
 
@@ -948,7 +948,7 @@ public class RangeBar extends View {
 
             mTickHeightDP = ta
                     .getDimension(R.styleable.RangeBar_tickHeight, DEFAULT_TICK_HEIGHT_DP);
-            mBarWeight = ta.getDimension(R.styleable.RangeBar_barWeight, DEFAULT_BAR_WEIGHT_PX);
+            mBarWeight = ta.getDimension(R.styleable.RangeBar_barWeight, DEFAULT_BAR_WEIGHT_DP);
             mBarColor = ta.getColor(R.styleable.RangeBar_barColor, DEFAULT_BAR_COLOR);
             mTextColor = ta.getColor(R.styleable.RangeBar_textColor, DEFAULT_TEXT_COLOR);
             mPinColor = ta.getColor(R.styleable.RangeBar_pinColor, DEFAULT_PIN_COLOR);
@@ -962,7 +962,7 @@ public class RangeBar extends View {
             mTickColor = ta.getColor(R.styleable.RangeBar_tickColor, DEFAULT_TICK_COLOR);
             mActiveTickColor = mTickColor;
             mConnectingLineWeight = ta.getDimension(R.styleable.RangeBar_connectingLineWeight,
-                    DEFAULT_CONNECTING_LINE_WEIGHT_PX);
+                    DEFAULT_CONNECTING_LINE_WEIGHT_DP);
             mConnectingLineColor = ta.getColor(R.styleable.RangeBar_connectingLineColor,
                     DEFAULT_CONNECTING_LINE_COLOR);
             mActiveConnectingLineColor = mConnectingLineColor;
@@ -1251,7 +1251,7 @@ public class RangeBar extends View {
     private void releasePin(final PinView thumb) {
 
         final float nearestTickX = mBar.getNearestTickCoordinate(thumb);
-        thumb.setX(nearestTickX);
+        thumb.smoothSetX(nearestTickX);
         int tickIndex = mBar.getNearestTickIndex(thumb);
         thumb.setXValue(getPinValue(tickIndex));
         ValueAnimator animator = ValueAnimator.ofFloat(mExpandedPinRadius, 0);
