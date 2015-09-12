@@ -22,5 +22,3 @@ android {
 repositories {
     mavenCentral()
 }
-
-apply from: '../../gradle-mvn-publish.gradle'
