@@ -84,7 +84,10 @@ class PinView extends View {
     private Paint mCirclePaint;
 
     private float mCircleRadiusPx;
+
     private IRangeBarFormatter formatter;
+
+    private boolean drawPin;
 
     // Constructors ////////////////////////////////////////////////////////////
 
@@ -256,16 +259,17 @@ class PinView extends View {
     //Draw the circle regardless of pressed state. If pin size is >0 then also draw the pin and text
     @Override
     public void draw(Canvas canvas) {
+        super.draw(canvas);
         canvas.drawCircle(mX, mY, mCircleRadiusPx, mCirclePaint);
         //Draw pin if pressed
-        if (mPinRadiusPx > 0) {
+        if (isDrawPin() && mPinRadiusPx > 0) {
             mBounds.set((int) mX - mPinRadiusPx,
                     (int) mY - (mPinRadiusPx * 2) - (int) mPinPadding,
                     (int) mX + mPinRadiusPx, (int) mY - (int) mPinPadding);
             mPin.setBounds(mBounds);
             String text = mValue;
 
-            if(this.formatter != null) {
+            if (this.formatter != null) {
                 text = formatter.format(text);
             }
 
@@ -290,5 +294,15 @@ class PinView extends View {
             float boxWidth) {
         paint.setTextSize(10);
         paint.setTextSize(Math.max(Math.min((boxWidth / paint.measureText(text)) * 10, max), min));
+    }
+
+    // Additional
+
+    public void setDrawPin(boolean drawPin) {
+        this.drawPin = drawPin;
+    }
+
+    public boolean isDrawPin() {
+        return drawPin;
     }
 }

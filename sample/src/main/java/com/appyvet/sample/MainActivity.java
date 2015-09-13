@@ -77,6 +77,7 @@ public class MainActivity extends Activity implements
 
         // Gets the RangeBar
         rangebar = (RangeBar) findViewById(R.id.rangebar1);
+        rangebar.setDrawPin(false);
 
         rangeButton.setOnClickListener(new View.OnClickListener() {
             @Override

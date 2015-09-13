@@ -175,9 +175,12 @@ public class RangeBar extends View {
     private float mLastX;
 
     private float mLastY;
+
     private IRangeBarFormatter mFormatter;
 
     private boolean drawTicks = true;
+
+    private boolean drawPin;
 
     // Constructors ////////////////////////////////////////////////////////////
 
@@ -363,13 +366,13 @@ public class RangeBar extends View {
         mBar.draw(canvas);
         if (mIsRangeBar) {
             mConnectingLine.draw(canvas, mLeftThumb, mRightThumb);
-            if(drawTicks) {
+            if (drawTicks) {
                 mBar.drawTicks(canvas);
             }
             mLeftThumb.draw(canvas);
         } else {
             mConnectingLine.draw(canvas, getMarginLeft(), mRightThumb);
-            if(drawTicks) {
+            if (drawTicks) {
                 mBar.drawTicks(canvas);
             }
         }
@@ -441,11 +444,11 @@ public class RangeBar extends View {
 
 
     public void setFormatter(IRangeBarFormatter formatter) {
-        if(mLeftThumb != null) {
+        if (mLeftThumb != null) {
             mLeftThumb.setFormatter(formatter);
         }
 
-        if(mRightThumb != null) {
+        if (mRightThumb != null) {
             mRightThumb.setFormatter(formatter);
         }
 
@@ -457,15 +460,16 @@ public class RangeBar extends View {
     }
 
     /**
-<<<<<<< HEAD
-    * Sets the range bar to a specific start, end, and interval
-    * This method is helpfull if you are changing the scale of the bar
-    * where calling setTickStart would though an exception because the number of
-    * ticks is < 2
-    * @param tickStart The new starting value of the range
-    * @param tickEnd The new ending tick value
-    * @param interval The new tick interval. (Must satisfy the condition number of ticks > 2)
-    **/
+     * <<<<<<< HEAD
+     * Sets the range bar to a specific start, end, and interval
+     * This method is helpfull if you are changing the scale of the bar
+     * where calling setTickStart would though an exception because the number of
+     * ticks is < 2
+     *
+     * @param tickStart The new starting value of the range
+     * @param tickEnd   The new ending tick value
+     * @param interval  The new tick interval. (Must satisfy the condition number of ticks > 2)
+     **/
     public void setTickRange(int tickStart, int tickEnd, int interval) {
         int tickCount = (int) ((tickEnd - tickStart) / interval) + 1;
         if (isValidTickCount(tickCount)) {
@@ -504,6 +508,7 @@ public class RangeBar extends View {
             throw new IllegalArgumentException("tickCount less than 2; invalid tickCount.");
         }
     }
+
     /* Sets a listener to modify the text
      * @param mPinTextListener
      */
@@ -679,6 +684,7 @@ public class RangeBar extends View {
         mPinColor = pinColor;
         createPins();
     }
+
     /**
      * Set the color of the text within the pin.
      *
@@ -792,12 +798,12 @@ public class RangeBar extends View {
     public void setRangePinsByIndices(int leftPinIndex, int rightPinIndex) {
         if (indexOutOfRange(leftPinIndex, rightPinIndex)) {
             Log.e(TAG,
-                    "Pin index left " + leftPinIndex + ", or right "+rightPinIndex
+                    "Pin index left " + leftPinIndex + ", or right " + rightPinIndex
                             + " is out of bounds. Check that it is greater than the minimum ("
                             + mTickStart + ") and less than the maximum value ("
                             + mTickEnd + ")");
             throw new IllegalArgumentException(
-                    "Pin index left " + leftPinIndex + ", or right "+rightPinIndex
+                    "Pin index left " + leftPinIndex + ", or right " + rightPinIndex
                             + " is out of bounds. Check that it is greater than the minimum ("
                             + mTickStart + ") and less than the maximum value ("
                             + mTickEnd + ")");
@@ -869,15 +875,15 @@ public class RangeBar extends View {
     public void setRangePinsByValue(float leftPinValue, float rightPinValue) {
         if (valueOutOfRange(leftPinValue, rightPinValue)) {
             Log.e(TAG,
-                    "Pin value left " + leftPinValue + ", or right "+rightPinValue
+                    "Pin value left " + leftPinValue + ", or right " + rightPinValue
                             + " is out of bounds. Check that it is greater than the minimum ("
                             + mTickStart + ") and less than the maximum value ("
                             + mTickEnd + ")");
             throw new IllegalArgumentException(
-                            "Pin value left " + leftPinValue + ", or right "+rightPinValue
-                                    + " is out of bounds. Check that it is greater than the minimum ("
-                                    + mTickStart + ") and less than the maximum value ("
-                                    + mTickEnd + ")");
+                    "Pin value left " + leftPinValue + ", or right " + rightPinValue
+                            + " is out of bounds. Check that it is greater than the minimum ("
+                            + mTickStart + ") and less than the maximum value ("
+                            + mTickEnd + ")");
         } else {
             if (mFirstSetTickCount) {
                 mFirstSetTickCount = false;
@@ -967,14 +973,13 @@ public class RangeBar extends View {
     }
 
     @Override
-    public void setEnabled(boolean enabled){
-        if(!enabled) {
+    public void setEnabled(boolean enabled) {
+        if (!enabled) {
             mBarColor = DEFAULT_BAR_COLOR;
             mConnectingLineColor = DEFAULT_BAR_COLOR;
             mCircleColor = DEFAULT_BAR_COLOR;
             mTickColor = DEFAULT_BAR_COLOR;
-        }
-        else{
+        } else {
             mBarColor = mActiveBarColor;
             mConnectingLineColor = mActiveConnectingLineColor;
             mCircleColor = mActiveCircleColor;
@@ -986,7 +991,6 @@ public class RangeBar extends View {
         createConnectingLine();
         super.setEnabled(enabled);
     }
-
 
     // Private Methods /////////////////////////////////////////////////////////
 
@@ -1113,9 +1117,11 @@ public class RangeBar extends View {
         if (mIsRangeBar) {
             mLeftThumb = new PinView(ctx);
             mLeftThumb.init(ctx, yPos, 0, mPinColor, mTextColor, mCircleSize, mCircleColor);
+            mLeftThumb.setDrawPin(isDrawPin());
         }
         mRightThumb = new PinView(ctx);
         mRightThumb.init(ctx, yPos, 0, mPinColor, mTextColor, mCircleSize, mCircleColor);
+        mRightThumb.setDrawPin(isDrawPin());
 
         float marginLeft = getMarginLeft();
         float barLength = getBarLength();
@@ -1294,11 +1300,11 @@ public class RangeBar extends View {
         final int componentLeft = getLeft() + getPaddingLeft();
         final int componentRight = getRight() - getPaddingRight() - componentLeft;
 
-        if (x<=componentLeft) {
+        if (x <= componentLeft) {
             newLeftIndex = 0;
             movePin(mLeftThumb, mBar.getLeftX());
-        } else if (x>=componentRight) {
-            newRightIndex = getTickCount()-1;
+        } else if (x >= componentRight) {
+            newRightIndex = getTickCount() - 1;
             movePin(mRightThumb, mBar.getRightX());
         }
         /// end added code
@@ -1379,12 +1385,12 @@ public class RangeBar extends View {
      * @param tickIndex the index to set the value for
      */
     private String getPinValue(int tickIndex) {
-        if (mPinTextListener!=null) {
+        if (mPinTextListener != null) {
             return mPinTextListener.getPinValue(this, tickIndex);
         }
         float tickValue = (tickIndex == (mTickCount - 1))
-                            ? mTickEnd
-                            : (tickIndex * mTickInterval) + mTickStart;
+                ? mTickEnd
+                : (tickIndex * mTickInterval) + mTickStart;
         String xValue = mTickMap.get(tickValue);
         if (xValue == null) {
             if (tickValue == Math.ceil(tickValue)) {
@@ -1414,6 +1420,17 @@ public class RangeBar extends View {
         }
     }
 
+    // Additional
+
+    public void setDrawPin(boolean drawPin) {
+        this.drawPin = drawPin;
+        createPins();
+    }
+
+    public boolean isDrawPin() {
+        return drawPin;
+    }
+
     // Inner Classes ///////////////////////////////////////////////////////////
 
     /**
@@ -1429,9 +1446,10 @@ public class RangeBar extends View {
 
     /**
      * @author robmunro
-     * A callback that allows getting pin text exernally
+     *         A callback that allows getting pin text exernally
      */
     public static interface OnRangeBarTextListener {
+
         public String getPinValue(RangeBar rangeBar, int tickIndex);
     }
 
