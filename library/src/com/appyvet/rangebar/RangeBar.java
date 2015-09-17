@@ -425,16 +425,7 @@ public class RangeBar extends View {
                 mDiffY += Math.abs(curY - mLastY);
                 mLastX = curX;
                 mLastY = curY;
-
-                if (mDiffX < mDiffY) {
-                    //vertical touch
-                    getParent().requestDisallowInterceptTouchEvent(false);
-                    return false;
-                } else {
-                    //horizontal touch (do nothing as it is needed for RangeBar)
-                }
                 return true;
-
             default:
                 return false;
         }
